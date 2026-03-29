@@ -555,6 +555,7 @@ publicsuffix
 python-apt-common
 python-babel-localedata
 python3
+python3-pip
 python3-apport
 python3-apt
 python3-attr
@@ -701,3 +702,5 @@ xml-core
 xxd
 xz-utils
 zlib1g:amd64
+gdb-arm-none-eabi
+openocd

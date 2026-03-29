@@ -1,0 +1,80 @@
+# Makefile for STM32 FreeRTOS Learning Project
+# 该模板遵循渐进式学习原则，保持简单清晰，每个部分都有注释说明
+
+# 工具链配置 - 使用ARM GNU工具链
+CROSS_COMPILE ?= arm-none-eabi-
+CC := $(CROSS_COMPILE)gcc
+LD := $(CROSS_COMPILE)ld
+OBJCOPY := $(CROSS_COMPILE)objcopy
+SIZE := $(CROSS_COMPILE)size
+
+# 项目名称 - 使用当前目录名作为项目名
+PROJECT := $(notdir $(CURDIR))
+
+# 目录配置
+BUILD_DIR := build
+SRC_DIR := src
+# FreeRTOS根目录相对于项目目录的路径
+FREERTOS_ROOT := ../../FreeRTOS/FreeRTOS/Source
+
+# 核心配置 - STM32F4Discovery作为默认目标
+MCU := cortex-m4
+ARCH_FLAGS := -mthumb -mcpu=$(MCU)
+
+# 编译选项 - 保留调试信息，优化等级适合学习
+CFLAGS := $(ARCH_FLAGS)
+CFLAGS += -g -O0 -Wall
+CFLAGS += -I$(SRC_DIR)
+CFLAGS += -I$(FREERTOS_ROOT)/include
+CFLAGS += -I$(FREERTOS_ROOT)/portable/GCC/ARM_CM4F
+
+# 链接选项
+LDFLAGS := $(ARCH_FLAGS)
+LDFLAGS += -Tlinker.ld
+LDFLAGS += -nostartfiles
+
+# 源文件 - 需要手动添加，保持清晰可见
+C_SOURCES := $(SRC_DIR)/main.c
+# FreeRTOS核心源文件
+C_SOURCES += \
+	$(FREERTOS_ROOT)/tasks.c \
+	$(FREERTOS_ROOT)/queue.c \
+	$(FREERTOS_ROOT)/list.c \
+	$(FREERTOS_ROOT)/portable/GCC/ARM_CM4F/port.c \
+	$(FREERTOS_ROOT)/portable/MemMang/heap_4.c
+
+# 转换为build目录下的.o文件路径
+OBJECTS := $(C_SOURCES:%.c=$(BUILD_DIR)/%.o)
+
+# 默认目标
+all: $(BUILD_DIR)/$(PROJECT).bin $(BUILD_DIR)/$(PROJECT).elf
+	@$(SIZE) $(BUILD_DIR)/$(PROJECT).elf
+
+# 生成bin文件
+$(BUILD_DIR)/$(PROJECT).bin: $(BUILD_DIR)/$(PROJECT).elf
+	@mkdir -p $(dir $@)
+	$(OBJCOPY) -O binary $< $@
+
+# 生成elf文件
+$(BUILD_DIR)/$(PROJECT).elf: $(OBJECTS) linker.ld
+	@mkdir -p $(dir $@)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+
+# 编译.c文件到.o
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# 清理编译产物
+clean:
+	rm -rf $(BUILD_DIR)
+
+# 使用QEMU运行程序
+run: all
+	qemu-system-arm -machine stm32f4-discovery -kernel $(BUILD_DIR)/$(PROJECT).elf -nographic -serial mon:stdio
+
+# 启动QEMU并等待GDB连接调试
+debug: all
+	qemu-system-arm -machine stm32f4-discovery -kernel $(BUILD_DIR)/$(PROJECT).elf -nographic -serial mon:stdio -s -S
+
+.PHONY: all clean run debug

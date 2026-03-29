@@ -503,14 +503,21 @@ fi
 info "正在检查TraceRecorder..."
 TRACERECORDER_DIR="FreeRTOS-Plus/Source/FreeRTOS-Plus-Trace"
 TRACERECORDER_URL="https://github.com/percepio/TraceRecorderSource.git"
+TRACERECORDER_VERSION="Tz4/4.6/v4.6.0"
 
 if [ ! -d "$TRACERECORDER_DIR" ] || [ -z "$(ls -A $TRACERECORDER_DIR 2>/dev/null)" ]; then
     info "TraceRecorder目录不存在或为空，正在克隆..."
     rm -rf "$TRACERECORDER_DIR" 2>/dev/null
     git clone "$TRACERECORDER_URL" "$TRACERECORDER_DIR" || error_exit "克隆TraceRecorder失败，请检查网络连接"
-    info "TraceRecorder克隆完成"
+    info "正在检出指定版本 $TRACERECORDER_VERSION..."
+    cd "$TRACERECORDER_DIR" && git checkout "$TRACERECORDER_VERSION" || error_exit "检出FreeRTOS-Plus-Trace版本失败，请检查网络连接和版本标签"
+    cd ../../..
+    info "FreeRTOS-Plus-Trace克隆和版本检出完成"
 else
-    info "TraceRecorder目录已存在且有内容，跳过克隆步骤"
+    info "TraceRecorder目录已存在且有内容，正在尝试切换到指定版本 $TRACERECORDER_VERSION..."
+    cd "$TRACERECORDER_DIR" && git checkout "$TRACERECORDER_VERSION" || error_exit "切换FreeRTOS-Plus-Trace版本失败，请手动处理"
+    cd ../../..
+    info "FreeRTOS-Plus-Trace版本切换完成"
 fi
 
 # 28. CMock (FreeRTOS/Test/CMock/CMock)
