@@ -704,3 +704,4 @@ xz-utils
 zlib1g:amd64
 gdb-arm-none-eabi
 openocd
+cmake
