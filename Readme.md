@@ -11,6 +11,32 @@
 
 本项目支持在WSL/Linux环境下开发，可通过QEMU进行仿真测试，也可编译下载到真实STM32硬件运行。
 
+## 项目工作流与设计理念
+
+### 1. 自动化教学的实现逻辑和准则
+
+官网的文档不够详细，代码不够完整，而指南中又是全英文，对学习不太友好。学了API后也难以更改代码，要么没法动手，要么要完完全全从0开始新增代码，对初学者来说面对大量的API和Makefile一类事物很困难。
+
+本项目的目的是把复杂的内容拆分成简单的部分，并且保证每一个部分都有对应的代码实例，可运行、可调试、可更改。
+
+### 2. 基于官方文档的实现原则
+
+项目严格依照官方文档和Demo去实现，在项目建立初期就手动下载了文档在项目中，并且让AI使用工具进行分割和索引（避免一个大文档的上下文过长），方便AI进行课程规划和梳理。
+
+### 3. 专有Skill设计
+
+项目使用完完全全专有的Skill，Skill高度专业化，明确Skill的职责就是进行该项目的内容生成，而不是其它项目。这样可以在Skill中写入对应的项目规则，便于规范项目管理。
+
+### 4. Plan驱动的协作方式
+
+项目使用Plan的方式，让Chat去关注Plan，并且通过留档doc和经验的方式，可以让新的Chat快速了解自己的职责和接下来的任务，避免了大规模的上下文导致AI变笨的情况。
+
+### 5. 免责声明
+
+因为我也还在学，所以无法保证项目内容的准确性，但是对初学者和入门来说帮助还是很大了，主要是分享工作流。
+
+**项目所有内容均由AI完成。**
+
 ## 目录结构总览
 
 ```
@@ -91,7 +117,7 @@ wsl --install --location D:\WSL\Ubuntu
 ### 2. 获取项目
 
 ```bash
-git clone https://git.code.tencent.com/Space0021/FreeRTOSDemo.git
+git clone https://github.com/space-spacee-clamation/FreeRTOS_Learn_by_AI.git
 cd FreeRTOSDemo
 code .  # 在VSCode中打开项目
 ```
@@ -117,53 +143,3 @@ sh ./init.sh
 ### 5. 快速导航
 
 完整的导航索引请参见 [`项目索引.md`](项目索引.md) 文件，包含所有重要文档的快速链接。
-
-## 初始化wsl
-
-如果您还没有安装WSL，可以按照以下步骤创建WSL虚拟机：
-
-1. 打开PowerShell或Windows命令提示符，执行以下命令进行安装：
-```bash
-wsl --install --location D:\WSL\Ubuntu
-```
-
-> **注意**：请使用`--location`参数指定WSL的安装路径，避免使用默认的系统盘路径，以节省系统盘空间。您可以根据自己的实际情况修改安装路径。
-
-2. 安装完成后，按照提示重启计算机。
-3. 重启后，WSL会自动启动，按照提示设置用户名和密码即可完成初始化。
-
-如果您已经安装了WSL，可以直接打开WSL终端继续下一步操作。
-
-## 拉取项目
-
-打开WSL终端后，使用以下命令拉取项目：
-
-```bash
-git clone https://git.code.tencent.com/Space0021/FreeRTOSDemo.git
-```
-
-进入项目目录：
-
-```bash
-cd FreeRTOSDemo
-```
-
-您可以使用以下命令在VSCode中打开项目：
-
-```bash
-code .
-```
-
-## 环境初始化
-
-在WSL终端中，进入项目目录后，运行初始化脚本：
-
-```bash
-sh ./init.sh
-```
-
-该脚本会自动完成以下操作：
-1. 使用`sudo apt install`安装编译工具和依赖包，包括`gcc`、`make`等
-2. 执行`git clone https://github.com/FreeRTOS/FreeRTOS.git --recurse-submodules`获取官方FreeRTOS源码
-
-> **注意**：FreeRTOS文件夹作为外部依赖，不会被提交到本项目仓库，已经添加到`.gitignore`中。如果您手动克隆FreeRTOS源码，请确保将其添加到`.gitignore`文件中。
